@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <EditText
+        android:layout_width="320dp"
+        android:layout_height="64dp"
+        android:layout_marginTop="16dp"
+        android:text="@string/edit_group_name_default"
+        android:id="@+id/edit_group_name"
+        />
+
+    <EditText
+        android:layout_width="320dp"
+        android:layout_height="64dp"
+        android:text="@string/edit_group_description_default"
+        android:id="@+id/edit_group_description"
+        />
+
+
+    <ListView
+        android:layout_width="match_parent"
+        android:layout_height="250dp"
+        android:id="@+id/edit_group_list">
+
+    </ListView>
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#200000AA"
+        android:src="@drawable/submit_button"
+        android:text="@string/submit"
+        android:id="@+id/edit_group_submit"
+        />
+
+
+
+
+</LinearLayout>

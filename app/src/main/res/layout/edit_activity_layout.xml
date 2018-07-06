@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <EditText
+        android:layout_width="320dp"
+        android:layout_height="64dp"
+        android:layout_marginTop="16dp"
+        android:text="@string/edit_activity_name_default"
+        android:id="@+id/edit_activity_name"
+        />
+
+    <EditText
+        android:layout_width="320dp"
+        android:layout_height="64dp"
+        android:text="@string/edit_activity_location_default"
+        android:id="@+id/edit_activity_location"
+        />
+
+    <EditText
+        android:layout_width="320dp"
+        android:layout_height="64dp"
+        android:text="@string/edit_activity_notes_default"
+        android:id="@+id/edit_activity_description"
+        />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal">
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/dollar_sign"
+        android:textSize="40sp"
+        android:layout_gravity="center_vertical"
+        android:layout_margin="2dp"/>
+    <!--<NumberPicker-->
+        <!--android:layout_width="40dp"-->
+        <!--android:layout_height="40dp"-->
+        <!--android:layout_gravity="center_vertical"-->
+        <!--android:id="@+id/price_range_min"-->
+        <!--android:layout_margin="2dp"-->
+        <!--&gt;-->
+    <!--</NumberPicker>-->
+        <EditText
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_gravity="center_vertical"
+            android:id="@+id/price_range_min"
+            android:layout_margin="2dp"
+            android:inputType="number"
+            android:maxLength="3"
+        />
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/hyphen"
+            android:textSize="40sp"
+            android:layout_margin="2dp"/>
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/dollar_sign"
+            android:textSize="40sp"
+            android:layout_gravity="center_vertical"
+            android:layout_margin="2dp"/>
+        <!--<NumberPicker-->
+            <!--android:layout_width="40dp"-->
+            <!--android:layout_height="40dp"-->
+            <!--android:layout_gravity="center_vertical"-->
+            <!--android:id="@+id/price_range_max"-->
+            <!--android:layout_margin="2dp"-->
+            <!--&gt;-->
+        <!--</NumberPicker>-->
+        <EditText
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_gravity="center_vertical"
+            android:id="@+id/price_range_max"
+            android:layout_margin="2dp"
+            android:inputType="number"
+            android:maxLength="3"
+            />
+
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal">
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/add_photo_button"
+            android:id="@+id/edit_add_photos_button"/>
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/add_tags_button"
+    android:id="@+id/edit_add_tags_button"/>
+
+</LinearLayout>
+
+
+<HorizontalScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/edit_photo_scroller">
+
+    </HorizontalScrollView>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <GridLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:columnCount="4"
+            android:id="@+id/edit_tag_grid">
+        </GridLayout>
+
+    </ScrollView>
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#200000AA"
+        android:src="@drawable/submit_button"
+        android:text="@string/submit"
+        android:id="@+id/edit_activity_submit"
+        />
+
+
+
+
+</LinearLayout>

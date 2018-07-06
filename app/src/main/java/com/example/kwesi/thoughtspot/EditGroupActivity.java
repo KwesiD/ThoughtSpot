@@ -2,7 +2,6 @@ package com.example.kwesi.thoughtspot;
 
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteDatabaseLockedException;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -20,12 +19,12 @@ public class EditGroupActivity extends AppCompatActivity {
         //the intent that called this activity
         Intent caller = getIntent();
         //checks for request code. If DNE, default to New Group
-        int requestCode = caller.getIntExtra("requestCode",IntentCodes.NEW_GROUP);
+        int requestCode = caller.getIntExtra("requestCode", Codes.NEW_GROUP);
 
-        if(requestCode == IntentCodes.NEW_GROUP){ //If we are creating new group
+        if(requestCode == Codes.NEW_GROUP){ //If we are creating new group
             createNewGroup();
         }
-        else if(requestCode == IntentCodes.EDIT_GROUP){ //If we are editing an old group
+        else if(requestCode == Codes.EDIT_GROUP){ //If we are editing an old group
             //TODO: Handle edit group
         }
     }

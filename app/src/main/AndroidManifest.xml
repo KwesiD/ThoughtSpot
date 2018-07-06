@@ -2,6 +2,20 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.kwesi.thoughtspot">
 
+
+    <uses-permission android:name="android.permission.CAMERA" />
+
+    <uses-feature
+        android:name="android.hardware.camera.any"
+        android:required="true" />
+
+    <uses-feature
+        android:name="android.hardware.camera.autofocus"
+        android:required="false" />
+
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -9,6 +23,17 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
+        <provider
+            android:name="android.support.v4.content.FileProvider"
+            android:authorities="com.example.kwesi.thoughtspot.fileprovider"
+            android:grantUriPermissions="true"
+            android:exported="false">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/filepaths" />
+        </provider>
+
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"
@@ -20,10 +45,15 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".EditActivitiesActivity"/>
+        <activity
+            android:name=".EditActivitiesActivity"
+            android:windowSoftInputMode="stateHidden"/>
 
-        <activity android:name=".EditGroupActivity"/>
+        <activity
+            android:name=".EditGroupActivity"
+            android:windowSoftInputMode="stateHidden"/>
 
     </application>
+
 
 </manifest>

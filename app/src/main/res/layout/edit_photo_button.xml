@@ -7,11 +7,13 @@
     <ImageView
         android:layout_width="100dp"
         android:layout_height="100dp"
-        android:alpha=".7"/>
+        android:alpha=".7"
+        android:id="@+id/thumbnail"/>
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@drawable/cancel"
-        android:foregroundGravity="top|left"/>
+        android:foregroundGravity="top|left"
+        android:id="@+id/cancel_button"/>
 
 </android.support.constraint.ConstraintLayout>

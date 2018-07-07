@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.kwesi.thoughtspot.MainActivity">
+    tools:context="com.example.kwesi.thoughtspot.MainActivity"
+    android:id="@+id/test">
 
     <!--<android.support.design.widget.AppBarLayout-->
         <!--android:layout_width="match_parent"-->
@@ -21,7 +22,17 @@
     <!--</android.support.design.widget.AppBarLayout>-->
 
 
-    <include layout="@layout/card_scroller" />
+    <!--<include layout="@layout/card_scroller" />-->
+
+    <android.support.v7.widget.RecyclerView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scrollbars="vertical"
+        android:id="@+id/card_scroller">
+
+    </android.support.v7.widget.RecyclerView>
+
 
     <LinearLayout
         android:layout_width="wrap_content"

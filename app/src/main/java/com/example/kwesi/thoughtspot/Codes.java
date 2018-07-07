@@ -13,6 +13,7 @@ public class Codes {
     public static final int EDIT_ACTIVITY = 3;
     public static final int START_CAMERA = 4;
     public static final int START_GALLERY = 5;
+    public static final int CREATED_ACTIVITY = 6;
 
 
     //Request Codes

@@ -1,6 +1,8 @@
 package com.example.kwesi.thoughtspot;
 
 import android.Manifest;
+import android.app.*;
+import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -42,7 +44,7 @@ import java.util.ArrayList;
  * pre-filled.
  */
 public class EditActivitiesActivity extends AppCompatActivity {
-    private String activityName; //The name of the activity
+    //private Activity activity; //The activity object
     private ArrayList<Bitmap> imageArray = new ArrayList<Bitmap>(); //TODO: Temporary until proper image methods are in place
     private ArrayList<String> tagArray = new ArrayList<String >(); //TODO: Also Temp
 
@@ -61,7 +63,6 @@ public class EditActivitiesActivity extends AppCompatActivity {
         addPhotos.setOnClickListener(addPhotoListener()); //Add a listener to the add photos button
 
         if(requestCode == Codes.NEW_ACTIVITY){ //If we are creating new activity
-            //TODO: Get values from input boxes
             Button submitButton = findViewById(R.id.edit_activity_submit);
             submitButton.setOnClickListener(submitListener());
         }
@@ -70,9 +71,10 @@ public class EditActivitiesActivity extends AppCompatActivity {
         }
     }
 
-    private void createNewActivity(){
-
-    }
+//    private Activity createNewActivity(String name,String location,String description,String min,String max,ArrayList<Bitmap> photos,ArrayList<String> tags){
+//        Activity newActivity = new Activity(name,location,description,min,max,photos,tags);
+//        return newActivity;
+//    }
 
     private ArrayList<Bitmap> getPhotos(){
         return imageArray;
@@ -110,13 +112,22 @@ public class EditActivitiesActivity extends AppCompatActivity {
                 else if(name.equals("") && location.equals("")){
                     Toast.makeText(view.getContext(),"Activity Name and Activity Location Required",Toast.LENGTH_SHORT).show();
                 }
-                else{
-                    String description = ((EditText)findViewById(R.id.edit_activity_description)).getText().toString().trim();
-                    String min = ((EditText)findViewById(R.id.price_range_min)).getText().toString().trim();
-                    String max = ((EditText)findViewById(R.id.price_range_max)).getText().toString().trim();
-                    ArrayList<Bitmap> photos = getPhotos();
-                    ArrayList<String> tags = getTags((GridLayout)findViewById(R.id.edit_tag_grid));
-                    setParameters(name,location,description,min,max,photos,tags);
+                else {
+                    String description = ((EditText) findViewById(R.id.edit_activity_description)).getText().toString().trim();
+                    String min = ((EditText) findViewById(R.id.price_range_min)).getText().toString().trim();
+                    String max = ((EditText) findViewById(R.id.price_range_max)).getText().toString().trim();
+                    //ArrayList<Bitmap> photos = getPhotos();
+                    ArrayList<String> tags = getTags((GridLayout) findViewById(R.id.edit_tag_grid));
+                    Intent returnIntent = new Intent();
+                    returnIntent.putExtra("name", name);
+                    returnIntent.putExtra("location", location);
+                    returnIntent.putExtra("description", description);
+                    returnIntent.putExtra("min", min);
+                    returnIntent.putExtra("max", max);
+                    //returnIntent.putExtra("photos", photos);
+                    returnIntent.putExtra("tags", tags);
+                    setResult(Activity.RESULT_OK, returnIntent);
+                    finish();
                 }
           }
         };
@@ -210,7 +221,7 @@ public class EditActivitiesActivity extends AppCompatActivity {
                 LinearLayout photoScroller = findViewById(R.id.edit_photo_scroller); //Horizontal scrolling view for thumbnails
                 photoScroller.addView(thumbnailView); //sets thumbnail as a child for the scrolling view
 
-                //TODO: Temporary - Replace with actual image methods
+                //TODO: Temporary - Replace with actual image methods w/ uri
                 imageArray.add(image);
                 //Temporary ^^
             }

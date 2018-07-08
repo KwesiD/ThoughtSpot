@@ -149,17 +149,19 @@ public class MainActivity extends AppCompatActivity {
 
     private void newActivityHandler(int resultCode,Intent data){
         if(resultCode == RESULT_OK){
-            ContentValues values = new ContentValues();
-            String name = data.getStringExtra("name");
+            //ContentValues values = new ContentValues();
+
+            /*String name = data.getStringExtra("name");
             String location = data.getStringExtra("location");
             String description = data.getStringExtra("description");
             String min = data.getStringExtra("min");
             String max = data.getStringExtra("max");
             //ArrayList<Bitmap> photos = data.getParcelableArrayListExtra("photos"); //TODO: Change <Bitmap> to <URI>
-            ArrayList<String> tags = data.getStringArrayListExtra("tags"); //TODO: JSON both photos and tags
+            ArrayList<String> tags = data.getStringArrayListExtra("tags"); //TODO: JSON both photos and tags*/
 
             RecyclerView scroller = findViewById(R.id.card_scroller); //TODO: What happens if i have 2 of these in different tabs?
-            Activity currActivity = new Activity(name,location,description,min,max,null,tags);
+            //Activity currActivity = new Activity(name,location,description,min,max,null,tags);
+            Activity currActivity = data.getExtras().getParcelable("activity");
             addNewActivity(currActivity);
 
         }
@@ -172,6 +174,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void addNewActivity(Activity activity){
         activityAdapter.add(activity,true);
+        //TODO:Call content values function from activitiy to add to database
     }
 
     private View createActivityCard(String name,String location,String description){

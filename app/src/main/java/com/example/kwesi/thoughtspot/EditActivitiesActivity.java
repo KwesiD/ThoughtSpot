@@ -31,7 +31,9 @@ import android.widget.Toast;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Array;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 /**
  * Created by Kwesi on 7/5/2018.
@@ -45,8 +47,9 @@ import java.util.ArrayList;
  */
 public class EditActivitiesActivity extends AppCompatActivity {
     //private Activity activity; //The activity object
-    private ArrayList<Bitmap> imageArray = new ArrayList<Bitmap>(); //TODO: Temporary until proper image methods are in place
+    private ArrayList<Uri> imageArray = new ArrayList<Uri>(); //TODO: Temporary until proper image methods are in place
     private ArrayList<String> tagArray = new ArrayList<String >(); //TODO: Also Temp
+    private Uri currImageUri;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -76,7 +79,7 @@ public class EditActivitiesActivity extends AppCompatActivity {
 //        return newActivity;
 //    }
 
-    private ArrayList<Bitmap> getPhotos(){
+    private ArrayList<Uri> getPhotos(){
         return imageArray;
     }
 
@@ -114,18 +117,20 @@ public class EditActivitiesActivity extends AppCompatActivity {
                 }
                 else {
                     String description = ((EditText) findViewById(R.id.edit_activity_description)).getText().toString().trim();
-                    String min = ((EditText) findViewById(R.id.price_range_min)).getText().toString().trim();
-                    String max = ((EditText) findViewById(R.id.price_range_max)).getText().toString().trim();
+                    String min = ((EditText) findViewById(R.id.price_range_min)).getText().toString().trim(); //TODO: Throw error + toast if min >= max
+                    String max = ((EditText) findViewById(R.id.price_range_max)).getText().toString().trim(); //TODO: Change min/max to ints
                     //ArrayList<Bitmap> photos = getPhotos();
                     ArrayList<String> tags = getTags((GridLayout) findViewById(R.id.edit_tag_grid));
                     Intent returnIntent = new Intent();
-                    returnIntent.putExtra("name", name);
+                    com.example.kwesi.thoughtspot.Activity activity = new com.example.kwesi.thoughtspot.Activity(name,location,description,min,max,null,tags);
+                    /*returnIntent.putExtra("name", name);
                     returnIntent.putExtra("location", location);
                     returnIntent.putExtra("description", description);
                     returnIntent.putExtra("min", min);
                     returnIntent.putExtra("max", max);
                     //returnIntent.putExtra("photos", photos);
-                    returnIntent.putExtra("tags", tags);
+                    returnIntent.putExtra("tags", tags);*/
+                    returnIntent.putExtra("activity",activity);
                     setResult(Activity.RESULT_OK, returnIntent);
                     finish();
                 }
@@ -171,8 +176,25 @@ public class EditActivitiesActivity extends AppCompatActivity {
                         if (checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) { //double check permissions before sending intent
                             requestPermissions(new String[]{Manifest.permission.CAMERA},Codes.CAMERA_REQUEST_CODE);
                         }
+                        File photoFile = null;
                         Intent photoIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                        startActivityForResult(photoIntent, Codes.START_CAMERA);
+                        try{
+                            photoFile = createImage();
+                            Uri photoUri = null;
+                            if(photoFile != null){
+                                photoUri = FileProvider.getUriForFile(view.getContext(),"com.example.kwesi.thoughtspot.fileprovider",photoFile);
+                                currImageUri = photoUri;
+                                photoIntent.putExtra(MediaStore.EXTRA_OUTPUT,photoUri);
+                                startActivityForResult(photoIntent, Codes.START_CAMERA);
+                            }
+                            else{
+                                throw new IOException("photoFile is null");
+                            }
+                        }
+                        catch (IOException io){
+                            io.printStackTrace();
+                            Toast.makeText(view.getContext(),"Error while creating file",Toast.LENGTH_SHORT).show();
+                        }
                     }
                 };
 
@@ -208,9 +230,11 @@ public class EditActivitiesActivity extends AppCompatActivity {
         if(resultCode == RESULT_OK){
             try{
 
-                Bundle extras = data.getExtras();
-                Bitmap image = (Bitmap) (extras.get("data")); //Get image bitmap
+                //Bundle extras = data.getExtras();
+                //Log.e("ResultHandler",extras.toString());
+                //Bitmap image = (Bitmap) (extras.get("data")); //Get image bitmap
 
+                Bitmap image = MediaStore.Images.Media.getBitmap(this.getContentResolver(),currImageUri);
                 //Inflate the layout for a thumbnail button
                 View thumbnailView;
                 LayoutInflater inflater = (LayoutInflater)getBaseContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -222,7 +246,7 @@ public class EditActivitiesActivity extends AppCompatActivity {
                 photoScroller.addView(thumbnailView); //sets thumbnail as a child for the scrolling view
 
                 //TODO: Temporary - Replace with actual image methods w/ uri
-                imageArray.add(image);
+                imageArray.add(currImageUri);
                 //Temporary ^^
             }
             catch (Exception e){
@@ -232,6 +256,14 @@ public class EditActivitiesActivity extends AppCompatActivity {
             }
         }
 
+    }
+
+    private File createImage() throws IOException{
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String fileName = "JPEG_" + timeStamp + "_";
+        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File image = File.createTempFile(fileName,".jpg",storageDir);
+        return image;
     }
 
 

@@ -14,13 +14,23 @@
         android:selectAllOnFocus="true"
         />
 
-    <EditText
-        android:layout_width="320dp"
-        android:layout_height="64dp"
-        android:text="@string/edit_activity_location_default"
-        android:id="@+id/edit_activity_location"
-        android:selectAllOnFocus="true"
-        />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <EditText
+            android:layout_width="320dp"
+            android:layout_height="64dp"
+            android:text="@string/edit_activity_location_default"
+            android:id="@+id/edit_activity_location"
+            android:selectAllOnFocus="true"
+            />
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:src="@drawable/edit_location"/>
+
+    </LinearLayout>
 
     <EditText
         android:layout_width="320dp"

@@ -3,8 +3,10 @@ package com.example.kwesi.thoughtspot;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
@@ -21,18 +23,25 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
-    private SQLiteDatabase groupsDatabase;
-    private SQLiteDatabase activitiesDatabase;
+//    private SQLiteDatabase groupsDatabase;
+//    private SQLiteDatabase activitiesDatabase;
+    private SQLiteDatabase database;
     private RecyclerView activityScroller;
     private ActivityAdapter activityAdapter;
     private RecyclerView.LayoutManager activityLayoutManager;
     private RecyclerView groupScroller;
-    private ArrayList<Activity> activityList; //adapter updates this list
+    //private ArrayList<Activity> activityList; //adapter updates this list
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,16 +50,15 @@ public class MainActivity extends AppCompatActivity {
 //        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
 //        setSupportActionBar(toolbar);
 
-        activityList = new ArrayList<Activity>();
-
         //Start Database
         initDatabases();
+        ArrayList<Activity> activityList = getActivitiesFromDatabase();
 
         activityScroller = findViewById(R.id.card_scroller);
         activityLayoutManager = new LinearLayoutManager(this);
         activityScroller.setLayoutManager(activityLayoutManager);
 
-        activityAdapter = new ActivityAdapter(getActivitiesFromDatabase());
+        activityAdapter = new ActivityAdapter(activityList);
         activityScroller.setAdapter(activityAdapter);
         //TODO: Create tab for groups and put its own scroller there
 
@@ -83,11 +91,11 @@ public class MainActivity extends AppCompatActivity {
      */
     public void initDatabases(){
         //Create Databases for groups and activities
-        groupsDatabase = openOrCreateDatabase("Groups",MODE_PRIVATE,null);
-        activitiesDatabase = openOrCreateDatabase("Activities",MODE_PRIVATE,null);
+        //groupsDatabase = openOrCreateDatabase("Groups",MODE_PRIVATE,null);
+        database = openOrCreateDatabase("Activities",MODE_PRIVATE,null);
 
-        groupsDatabase.execSQL(
-                "CREATE TABLE IF NOT EXISTS TASKS " +
+        database.execSQL(
+                "CREATE TABLE IF NOT EXISTS Groups " +
                         "(id INTEGER PRIMARY KEY AUTOINCREMENT, " +
                         "name VARCHAR," +
                         "description VARCHAR," +
@@ -97,8 +105,8 @@ public class MainActivity extends AppCompatActivity {
                         "lastUpdated DATETIME);"
         );
 
-        activitiesDatabase.execSQL(
-                "CREATE TABLE IF NOT EXISTS TASKS " +
+        database.execSQL(
+                "CREATE TABLE IF NOT EXISTS Activities " +
                         "(id INTEGER PRIMARY KEY AUTOINCREMENT," +
                         "name VARCHAR," +
                         "location VARCHAR," +  //Either address or longitude + latitude
@@ -107,9 +115,10 @@ public class MainActivity extends AppCompatActivity {
                         "priceMin INTEGER," +
                         "priceMax INTEGER," +
                         "photoList VARCHAR," + //JSON String of arraylist
-                        "tagList VARCHAR," +
-                        "createdOn DATETIME," +
-                        "lastUpdated DATETIME);" //JSON String of arraylist
+                        "tagList VARCHAR" +  //JSON String of arraylist
+                        ");"
+                       /* "createdOn DATETIME," +
+                        "lastUpdated DATETIME);"*/
         );
 
     }
@@ -149,16 +158,6 @@ public class MainActivity extends AppCompatActivity {
 
     private void newActivityHandler(int resultCode,Intent data){
         if(resultCode == RESULT_OK){
-            //ContentValues values = new ContentValues();
-
-            /*String name = data.getStringExtra("name");
-            String location = data.getStringExtra("location");
-            String description = data.getStringExtra("description");
-            String min = data.getStringExtra("min");
-            String max = data.getStringExtra("max");
-            //ArrayList<Bitmap> photos = data.getParcelableArrayListExtra("photos"); //TODO: Change <Bitmap> to <URI>
-            ArrayList<String> tags = data.getStringArrayListExtra("tags"); //TODO: JSON both photos and tags*/
-
             RecyclerView scroller = findViewById(R.id.card_scroller); //TODO: What happens if i have 2 of these in different tabs?
             //Activity currActivity = new Activity(name,location,description,min,max,null,tags);
             Activity currActivity = data.getExtras().getParcelable("activity");
@@ -168,13 +167,64 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private ArrayList<Activity> getActivitiesFromDatabase(){
-        //TODO: Temp. For now, return activity arraylist.
+        ArrayList<Activity> activityList = new ArrayList<Activity>();
+
+        Cursor cursor = database.rawQuery("SELECT * FROM Activities",null);
+        cursor.moveToFirst();
+        while(!cursor.isAfterLast()){
+            String name = cursor.getString(1);
+            String location = cursor.getString(2);
+            String description = cursor.getString(4);
+            int min = cursor.getInt(5);
+            int max = cursor.getInt(6);
+            ArrayList<Uri> photos = new ArrayList<Uri>();
+            ArrayList<String> tags = new ArrayList<String>();
+            decodePhotosJSON(cursor.getString(7),photos,"photos");
+            decodeTagsJSON(cursor.getString(8),tags,"tags");
+            activityList.add(new Activity(name,location,description,min,max,photos,tags));
+            cursor.moveToNext();
+        }
         return activityList;
     }
 
+    private void decodePhotosJSON(String jsonString,ArrayList arrayList,String label){
+        JSONObject jsonObject;
+
+        try {
+            jsonObject = new JSONObject(jsonString);
+            String arrayString = (String)jsonObject.get(label);
+            arrayString.substring(1,arrayString.length()-1);
+            String[] stringList = arrayString.split(",");
+            for(int i = 0;i < stringList.length;i++){
+                arrayList.add(Uri.parse(stringList[i].trim()));
+            }
+        }
+        catch (JSONException j){
+            j.printStackTrace();
+        }
+    }
+    private void decodeTagsJSON(String jsonString,ArrayList arrayList,String label){
+        JSONObject jsonObject;
+
+        try {
+            jsonObject = new JSONObject(jsonString);
+            String arrayString = (String)jsonObject.get(label);
+            arrayString.substring(1,arrayString.length()-1);
+            String[] stringList = arrayString.split(",");
+            for(int i = 0;i < stringList.length;i++){
+                arrayList.add(stringList[i].trim());
+            }
+        }
+        catch (JSONException j){
+            j.printStackTrace();
+        }
+    }
+
+
     private void addNewActivity(Activity activity){
         activityAdapter.add(activity,true);
-        //TODO:Call content values function from activitiy to add to database
+        database.insert("Activities",null,activity.getContentValues());
+        //Log.e("addnewactivity",activity.getPhotos().toString());
     }
 
     private View createActivityCard(String name,String location,String description){

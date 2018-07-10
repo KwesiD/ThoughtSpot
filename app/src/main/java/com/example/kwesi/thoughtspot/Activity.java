@@ -1,10 +1,15 @@
 package com.example.kwesi.thoughtspot;
 
+import android.content.ContentValues;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 
@@ -22,25 +27,34 @@ public class Activity implements Parcelable {
     private ArrayList<Uri> photos;
     private ArrayList<String> tags;
 
-    public Activity(String name, String location, String description, String min, String max, ArrayList<Uri> photos, ArrayList<String> tags){
+    public Activity(String name, String location, String description, String min, String max, ArrayList<Uri> photos, ArrayList<String> tags) {
         this.name = name;
         this.location = location;
         this.description = description;
-        if(min.equals("")){
+        if (min.equals("")) {
             this.min = 0;
-        }
-        else{
+        } else {
             this.min = Integer.parseInt(min);
         }
-        if(max.equals("")){
+        if (max.equals("")) {
             this.max = 0;
-        }
-        else{
+        } else {
             this.max = Integer.parseInt(max);
         }
         this.photos = photos;
         this.tags = tags;
     }
+
+    public Activity(String name, String location, String description, int min, int max, ArrayList<Uri> photos, ArrayList<String> tags) {
+        this.name = name;
+        this.location = location;
+        this.description = description;
+        this.min = min;
+        this.max = max;
+        this.photos = photos;
+        this.tags = tags;
+    }
+
     public String getName() {
         return name;
     }
@@ -71,13 +85,13 @@ public class Activity implements Parcelable {
 
 
     //Parcelable constructor
-    public Activity(Parcel in){
+    public Activity(Parcel in) {
         name = in.readString();
         location = in.readString();
         description = in.readString();
         min = in.readInt();
         max = in.readInt();
-        photos = (ArrayList<Uri>) in.readSerializable();
+        photos = StringArrayToUri((ArrayList<String>) in.readSerializable());
         tags = (ArrayList<String>) in.readSerializable();
     }
 
@@ -93,19 +107,65 @@ public class Activity implements Parcelable {
         dest.writeString(description);
         dest.writeInt(min);
         dest.writeInt(max);
-        dest.writeSerializable(photos);
+        dest.writeSerializable(UriArrayToString(photos));
         dest.writeSerializable(tags);
     }
 
-    public static final Parcelable.Creator CREATOR = new Parcelable.Creator(){
-        public Activity createFromParcel(Parcel in){
+    public static final Parcelable.Creator CREATOR = new Parcelable.Creator() {
+        public Activity createFromParcel(Parcel in) {
             return new Activity(in);
         }
 
-        public Activity[] newArray(int size){
+        public Activity[] newArray(int size) {
             return new Activity[size];
         }
     };
 
-    //TODO: Create method to return content values for database insertion
+    private ArrayList<String> UriArrayToString(ArrayList<Uri> uriList){
+        ArrayList<String> stringList = new ArrayList<String>(uriList.size());
+        for(int i = 0;i < uriList.size();i++){
+            stringList.add(uriList.get(i).toString());
+        }
+        return stringList;
+    }
+
+    private ArrayList<Uri> StringArrayToUri(ArrayList<String> stringList){
+        ArrayList<Uri> uriList = new ArrayList<Uri>(stringList.size());
+        for(int i = 0;i < stringList.size();i++){
+            uriList.add(Uri.parse(stringList.get(i)));
+        }
+        return uriList;
+    }
+
+    public ContentValues getContentValues() {
+        ContentValues values = new ContentValues();
+        values.put("name", name);
+        values.put("location", location);
+        values.put("locationType", getLocationType(location));
+        values.put("description", description);
+        values.put("priceMin", min);
+        values.put("priceMax", max);
+        values.put("photoList",toJSONString(photos,"photos"));
+        values.put("tagList",toJSONString(tags,"tags"));
+
+        return values;
+    }
+
+    public int getLocationType(String location) {
+        return 0; //TODO:Temp
+    }
+
+    public String toJSONString(ArrayList arrayList,String jsonName){
+        JSONObject json = new JSONObject();
+        try {
+            json.put(jsonName, arrayList);
+        }
+        catch(JSONException j){
+            j.printStackTrace();
+        }
+        return json.toString();
+    }
+
 }
+
+

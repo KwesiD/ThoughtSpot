@@ -26,6 +26,7 @@ import android.widget.GridLayout;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.File;
@@ -34,6 +35,8 @@ import java.lang.reflect.Array;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+
+import android.support.v4.app.DialogFragment;
 
 /**
  * Created by Kwesi on 7/5/2018.
@@ -45,7 +48,7 @@ import java.util.Date;
  * If the user chooses to edit an activity, they are brought to this same page, but with the fields
  * pre-filled.
  */
-public class EditActivitiesActivity extends AppCompatActivity {
+public class EditActivitiesActivity extends AppCompatActivity implements AddTaskDialog.AddTaskDialogListener{
     //private Activity activity; //The activity object
     private ArrayList<Uri> imageArray = new ArrayList<Uri>(); //TODO: Temporary until proper image methods are in place
     private ArrayList<String> tagArray = new ArrayList<String >(); //TODO: Also Temp
@@ -64,6 +67,9 @@ public class EditActivitiesActivity extends AppCompatActivity {
 
         Button addPhotos = findViewById(R.id.edit_add_photos_button);
         addPhotos.setOnClickListener(addPhotoListener()); //Add a listener to the add photos button
+
+        Button addTags = findViewById(R.id.edit_add_tags_button);
+        addTags.setOnClickListener(addTagsListener());
 
         if(requestCode == Codes.NEW_ACTIVITY){ //If we are creating new activity
             Button submitButton = findViewById(R.id.edit_activity_submit);
@@ -84,11 +90,17 @@ public class EditActivitiesActivity extends AppCompatActivity {
     }
 
     private ArrayList<String> getTags(GridLayout tagGrid){
-
         return tagArray;
     }
 
-    private void setParameters(String name,String location,String description,String min,String max,ArrayList<Bitmap> photos,ArrayList<String> tags){
+    private void addTag(String tag){
+        tagArray.add(tag);
+        LayoutInflater inflater = getLayoutInflater();
+        View tagView = inflater.inflate(R.layout.tag_layout,null);
+        TextView tagText = tagView.findViewById(R.id.tag_text);
+        tagText.setText(tag);
+        GridLayout tagGrid = findViewById(R.id.edit_tag_grid);
+        tagGrid.addView(tagView);
 
     }
 
@@ -119,10 +131,10 @@ public class EditActivitiesActivity extends AppCompatActivity {
                     String description = ((EditText) findViewById(R.id.edit_activity_description)).getText().toString().trim();
                     String min = ((EditText) findViewById(R.id.price_range_min)).getText().toString().trim(); //TODO: Throw error + toast if min >= max
                     String max = ((EditText) findViewById(R.id.price_range_max)).getText().toString().trim(); //TODO: Change min/max to ints
-                    //ArrayList<Bitmap> photos = getPhotos();
+                    ArrayList<Uri> photos = getPhotos();
                     ArrayList<String> tags = getTags((GridLayout) findViewById(R.id.edit_tag_grid));
                     Intent returnIntent = new Intent();
-                    com.example.kwesi.thoughtspot.Activity activity = new com.example.kwesi.thoughtspot.Activity(name,location,description,min,max,null,tags);
+                    com.example.kwesi.thoughtspot.Activity activity = new com.example.kwesi.thoughtspot.Activity(name,location,description,min,max,photos,tags);
                     /*returnIntent.putExtra("name", name);
                     returnIntent.putExtra("location", location);
                     returnIntent.putExtra("description", description);
@@ -245,7 +257,6 @@ public class EditActivitiesActivity extends AppCompatActivity {
                 LinearLayout photoScroller = findViewById(R.id.edit_photo_scroller); //Horizontal scrolling view for thumbnails
                 photoScroller.addView(thumbnailView); //sets thumbnail as a child for the scrolling view
 
-                //TODO: Temporary - Replace with actual image methods w/ uri
                 imageArray.add(currImageUri);
                 //Temporary ^^
             }
@@ -266,5 +277,24 @@ public class EditActivitiesActivity extends AppCompatActivity {
         return image;
     }
 
+    private View.OnClickListener addTagsListener(){
+        View.OnClickListener listener = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                DialogFragment dialog = new AddTaskDialog();
+                dialog.show(getSupportFragmentManager(),"AddTaskDialog");
+            }
+        };
+        return listener;
+    }
 
+    @Override
+    public void onDialogPositiveClick(DialogFragment dialog) {
+        addTag(((AddTaskDialog)dialog).getCurrTag());
+    }
+
+   /* @Override
+    public void onDialogNegativeClick(DialogFragment dialog) {
+
+    }*/
 }
